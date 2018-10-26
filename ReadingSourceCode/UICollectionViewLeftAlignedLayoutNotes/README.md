@@ -1,6 +1,6 @@
-#UICollectionViewLeftAlignedLayout 源码阅读
+# UICollectionViewLeftAlignedLayout 源码阅读
 
-##为什么要用这个库？
+## 为什么要用这个库？
 首先我们要知道UICollectionViewFlowLayout 默认的排布方式是：
 itemSize 需要我们设置好固定大小或者通过UIcollectionViewFlowLayout的delegate方法来计算并返回.
 举个例子： 假如我们设置itemSize固定大小为CGSizeMake(150,150),
@@ -8,7 +8,7 @@ itemSize 需要我们设置好固定大小或者通过UIcollectionViewFlowLayout
 
 发现其排布方式是靠左一个，靠右一个，中间会流出75pt的空白。如果我们想让每个item之间间距为minimumInteritemSpacing 固定大小，那该怎么办呢？这时候，就需要我们来自定义layout了，像一些瀑布流layout 一样。
 UICollectionViewLeftAlignedLayout 就是帮我们做了自定义layout 的事情，我们直接可以拿来用即可，就像平常用系统的UICollectionViewFlowLayout 一样。
-##阅读源码
+## 阅读源码
 这个库看起来比较简单明了，就一个类：`UICollectionViewLeftAlignedLayout`，继承自系统`UICollectionViewFlowLayout`
 同时声明一个`UICollectionViewDelegateLeftAlignedLayout`协议，该协议遵循`<UICollectionViewDelegateFlowLayout>`
 
@@ -41,7 +41,7 @@ UICollectionViewLeftAlignedLayout 就是帮我们做了自定义layout 的事情
 
 通过重写这四个方法来
 
-##最后附上这个库的地址
+## 最后附上这个库的地址
 - [UICollectionViewLeftAlignedLayout](https://github.com/mokagio/UICollectionViewLeftAlignedLayout)
 
 
