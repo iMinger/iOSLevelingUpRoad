@@ -39,7 +39,9 @@ UICollectionViewLeftAlignedLayout 就是帮我们做了自定义layout 的事情
 - (nullable UICollectionViewLayoutAttributes *)layoutAttributesForDecorationViewOfKind:(NSString*)elementKind atIndexPath:(NSIndexPath *)indexPath;
 ```
 
-通过重写这四个方法来
+**通过重写这四个方法来计算并排布每个item 的位置和大小。**
+
+
 
 ## 最后附上这个库的地址
 - [UICollectionViewLeftAlignedLayout](https://github.com/mokagio/UICollectionViewLeftAlignedLayout)
