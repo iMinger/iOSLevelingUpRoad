@@ -1,10 +1,35 @@
 # 内存管理
 
-### 1.什么情况下使用weak,和assign 有什么不同？
-### 2.runtime 如何实现weak 属性？ （weak 变量的自动置nil）
+- 1.什么情况下使用weak,和assign 有什么不同？
+- 2.runtime 如何实现weak 属性？ （weak 变量的自动置nil）
+
 # runtime
 
-### 1. 使用runtime associate 方法关联的对象，需要在主对象dealloc的时候释放吗？
+- 1. 使用runtime associate 方法关联的对象，需要在主对象dealloc的时候释放吗？
+- 2.分类
+    - 1.分类可以添加什么，不可以添加什么？
+    - 2.分类中方法和所属主类中的方法名相同的话，会执行哪个？为什么？
+    - 3.两个分类中添加了同一个方法，但是方法的实现不同，那么，当调用这个方法时，会执行哪个？为什么？
 
 # runloop
+- 1.讲讲RunLoop,项目中有用到吗？
+- 2.RunLoop 内部实现逻辑？
+- 3.RunLoop 和线程的关系？
+- 4.timer 与 RunLoop 的关系？
+- 5.程序中添加每3秒响应一次的NSTimer,当拖动scrollview时timer可能无法响应时应该怎么解决？
+- 6.RunLoop是怎么响应用户操作的，具体流程是怎么样的？
+- 7.说说RunLoop的几种状态
+- 8.RunLoop的mode的左右是什么？
 
+#源码分析
+
+#杂项
+- 1.iOS中常用到的定时器有哪些？分别描述一下其原理以及优缺点？（NSTimer,CADisplayLink,dispatch_source_t）
+- 2.iOS 中常用到的锁有哪些？
+- 3.iOS 接受通知的线程一定是主线程吗？（或者说iOS 在子线程中发送通知，主线程中接收到处理事件会有什么问题吗？）
+
+
+#数据结构与算法
+- 1.单链表的反转
+- 2.判断一个单链表是否有环。
+- 

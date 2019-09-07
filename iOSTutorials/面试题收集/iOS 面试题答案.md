@@ -1,15 +1,13 @@
-#一 内存管理
-
-### 1.什么情况下使用weak,和assign 有什么不同？
+# 内存管理
+- 1.什么情况下使用weak,和assign 有什么不同？
 什么情况下使用`weak`关键字：
-1. `weak` 是为了打破循环引用而使用的。可以用来修饰代理，`block`外的对象等。
-2. 在自身已经对它进行过一次强引用的情况下，没有必要再强引用一次，此时也是会用`weak`,例如自定义IBoutlet 控件属性一般设置为weak
+    1. `weak` 是为了打破循环引用而使用的。可以用来修饰代理，`block`外的对象等。
+    2. 在自身已经对它进行过一次强引用的情况下，没有必要再强引用一次，此时也是会用`weak`,例如自定义IBoutlet 控件属性一般设置为weak
 
-不同点:
-1.`weak`: 此特质表明该属性（对象）定义了一种“非拥有关系”（nonowning relationship）.为这种属性设置新值时，设置方法既不保留新值，也不释放旧值。此特质同assign类似， 然而在属性所指的对象遭到摧毁时，属性值也会清空(nil out)。 而 assign 的“设置方法”只会执行针对“纯量类型” (scalar type，例如 `CGFloat` 或 `NSlnteger` 等)的简单赋值操作。
-2.从修饰对象范围来看，`assign` 可以用非 OC 对象,而 `weak` 必须用于 OC 对象.  `assign` : 现在主要是修饰基本数据类型。
-
-### 2.runtime 如何实现weak 属性？ （weak 变量的自动置nil）
+    不同点:
+    1.`weak`: 此特质表明该属性（对象）定义了一种“非拥有关系”（nonowning relationship）.为这种属性设置新值时，设置方法既不保留新值，也不释放旧值。此特质同assign类似， 然而在属性所指的对象遭到摧毁时，属性值也会清空(nil out)。 而 assign 的“设置方法”只会执行针对“纯量类型” (scalar type，例如 `CGFloat` 或 `NSlnteger` 等)的简单赋值操作。
+    2.从修饰对象范围来看，`assign` 可以用非 OC 对象,而 `weak` 必须用于 OC 对象.  `assign` : 现在主要是修饰基本数据类型。
+- 2.runtime 如何实现weak 属性？ （weak 变量的自动置nil）
 
 要想实现weak 属性，首先要搞清楚weak 属相的特点：
 >  此特质表明该属性（对象）定义了一种“非拥有关系”（nonowning relationship）.为这种属性设置新值时，设置方法既不保留新值，也不释放旧值。此特质同assign类似， 然而在属性所指的对象遭到摧毁时，属性值也会清空(nil out)。 而 assign 的“设置方法”只会执行针对“纯量类型” (scalar type，例如 `CGFloat` 或 `NSlnteger` 等)的简单赋值操作。
@@ -129,6 +127,39 @@ objc_storeWeak 函数把第二个参数--赋值对象（obj）的内存地址作
 
 
 #二 runtime
-### 1. 使用runtime associate 方法关联的对象，需要在主对象dealloc的时候释放吗？
+- 1. 使用runtime associate 方法关联的对象，需要在主对象dealloc的时候释放吗？
+- 2.分类
+    - 1.分类可以添加什么，不可以添加什么？
+    - 2.分类中方法和所属主类中的方法名相同的话，会执行哪个？为什么？
+    - 3.两个分类中添加了同一个方法，但是方法的实现不同，那么，当调用这个方法时，会执行哪个？为什么？
 
 #三 runloop
+- 1.讲讲RunLoop,项目中有用到吗？
+- 2.RunLoop 内部实现逻辑？
+- 3.RunLoop 和线程的关系？
+- 4.timer 与 RunLoop 的关系？
+- 5.程序中添加每3秒响应一次的NSTimer,当拖动scrollview时timer可能无法响应时应该怎么解决？
+- 6.RunLoop是怎么响应用户操作的，具体流程是怎么样的？
+- 7.说说RunLoop的几种状态
+- 8.RunLoop的mode的左右是什么？
+
+#源码分析
+
+#杂项
+- 1.iOS中常用到的定时器有哪些？分别描述一下其原理以及优缺点？（NSTimer,CADisplayLink,dispatch_source_t）
+- 2.iOS 中常用到的锁有哪些？
+- 3.iOS 接受通知的线程一定是主线程吗？（或者说iOS 在子线程中发送通知，主线程中接收到处理事件会有什么问题吗？）
+    问题：在主线程中A对象监听到通知B后，调用函数functionX。然后我们开启一条子线程，在子线程中发出通知B。现在问A对象执行方法functionX时是在哪个线程？
+    ```
+    In a multithreaded application, notifications are always delivered in
+the thread in which the notification was posted, which may not be the
+same thread in which an observer registered itself.
+官方文档说：在多线程的程序中，通知会在post通知时所在的线程被传达，这就导致了观察者注册通知的线程和收到通知的线程不在一个线程。
+    ```
+    经过Xcode 执行后functionX 是在发送通知的子线程执行的。这样的话，如果在子线程中进行UI 操作的话，就会出现crash.因此在这种情况下，需要回到主线程进行操作。
+    
+
+
+#数据结构与算法
+- 1.单链表的反转
+- 2.判断一个单链表是否有环。
