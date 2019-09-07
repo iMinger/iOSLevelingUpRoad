@@ -360,6 +360,7 @@ struct protocol_list_t {
     }
 };
 
+//stamp 铭刻的，有邮戳的
 struct locstamped_category_t {
     category_t *cat;
     struct header_info *hi;
@@ -569,7 +570,11 @@ struct class_ro_t {
 * countLists/beginLists/endLists iterate the metadata lists
 * count/begin/end iterate the underlying metadata elements
 **********************************************************************/
+
+
 template <typename Element, typename List>
+
+// 定义一个list_array_tt 类，
 class list_array_tt {
     struct array_t {
         uint32_t count;

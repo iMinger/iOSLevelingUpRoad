@@ -619,6 +619,7 @@ prepareMethodLists(Class cls, method_list_t **addedLists, int addedCount,
 // Assumes the categories in cats are all loaded and sorted by load order, 
 // oldest categories first.
 
+#pragma mark attachCategories 贴上分类
 // 贴上（这个类的）所有的分类
 static void 
 attachCategories(Class cls, category_list *cats, bool flush_caches)
