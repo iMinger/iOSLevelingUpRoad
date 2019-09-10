@@ -128,6 +128,8 @@ objc_storeWeak 函数把第二个参数--赋值对象（obj）的内存地址作
 
 #二 runtime
 - 1. 使用runtime associate 方法关联的对象，需要在主对象dealloc的时候释放吗？
+    
+    具体可看一下[iOS：三种常见计时器（NSTimer、CADisplayLink、dispatch_source_t）的使用](https://www.cnblogs.com/XYQ-208910/p/6590829.html)
 - 2.分类
     - 1.分类可以添加什么，不可以添加什么？
     - 2.分类中方法和所属主类中的方法名相同的话，会执行哪个？为什么？
@@ -143,6 +145,11 @@ objc_storeWeak 函数把第二个参数--赋值对象（obj）的内存地址作
 - 7.说说RunLoop的几种状态
 - 8.RunLoop的mode的左右是什么？
 
+# 网络
+- 1.TCP 为什么是三次握手和四次挥手？
+    
+- 2.TCP和UDP 的区别？为什么UDP传输的速率快？
+
 #源码分析
 
 #杂项
@@ -150,6 +157,7 @@ objc_storeWeak 函数把第二个参数--赋值对象（obj）的内存地址作
 - 2.iOS 中常用到的锁有哪些？
 - 3.iOS 接受通知的线程一定是主线程吗？（或者说iOS 在子线程中发送通知，主线程中接收到处理事件会有什么问题吗？）
     问题：在主线程中A对象监听到通知B后，调用函数functionX。然后我们开启一条子线程，在子线程中发出通知B。现在问A对象执行方法functionX时是在哪个线程？
+ 
     ```
     In a multithreaded application, notifications are always delivered in
 the thread in which the notification was posted, which may not be the
@@ -157,6 +165,88 @@ same thread in which an observer registered itself.
 官方文档说：在多线程的程序中，通知会在post通知时所在的线程被传达，这就导致了观察者注册通知的线程和收到通知的线程不在一个线程。
     ```
     经过Xcode 执行后functionX 是在发送通知的子线程执行的。这样的话，如果在子线程中进行UI 操作的话，就会出现crash.因此在这种情况下，需要回到主线程进行操作。
+- 4.项目国际化方案？
+    接口国际化？ 在请求request header 中添加一个 language 字段，将要请求的语言做value传进去。
+    时间国际化？ 跟服务端约定好，凡是涉及到时间相关的字段，都要返回时间戳格式。然后通过NSDateFormatter 对象将时间戳转换成可用的字符串，NSDateFormatter 对象里有个TimeZone 属性，默认是取系统当前时区，那么我们要做的是不去setTimeZone.这样获取到的就是当前系统对应的时间，随系统时区切换，时间也会跟着变化。
+    字符串国际化？ 字符串加宏。 Localizable.strings 文件生成
+    storyboard/xib下的string文件管理
+    
+    应用内动态更新语言？
+        常见的更新语言方式：
+        1.reloadRootViewController
+        2.通知
+        3.预留更新文字的方法。
+        方法一代码成本低，改动的地方少。
+    
+    国际化相关的工具：
+    [TCZLocalizableTool](https://github.com/lefex/TCZLocalizableTool)
+    
+    引用文章：
+    [iOS国际化方案---看我就够
+](https://www.jianshu.com/p/1550f2835f4f)
+
+- 5.H5与native交互？
+    - JavascripCore
+        OC与JS的交互如下：
+        这个里面主要用到了两个类:JSContext和JSValue.
+        - JSContext 
+        是JS代码的执行环境，JSContext为JS的执行提供了上下文环境，通过JSCore执行的JS代码都是得通过JSContext来执行
+        JSContext 对应于一个JS中的全局对象JSContext对应着一个全局对象，相当于浏览器中的window对象，JSContext中有一个GlobalObject属性，实际上JS代码都是在这个GlobalObject上执行的，但是为了容易理解，可以把JSContext等价于全局对象。
+        
+        - JSValue 
+        JSValue 是对JS值的包装，JS中的值拿到OC中是不能直接使用的，需要包装一下，这个JSValue就是对JS值的包装，一个JSValue对应着一个JS值，这个JS值可能是JS中的number，boolean等基本类型，也可能是对象，函数，设置可以是undefined,或者null，
+        就是JS中的var
+        
+        使用：
+        
+        JS中的代码
+        ```
+        var factorial = function (n) {
+            if (n < 0)  return;
+            if (n = 0)  return 1;
+            return n * factorial(n - 1);
+        }
+        ```
+        
+        OC中调用这个JS中的函数
+        ```
+        NSString *factorialScript = [self loadJSFromBundle];
+        JSContext context = [[JSContext alloc]init];
+        [context evaluateScript:factorialScript];
+        JSValue *function = context[@"factorial"];
+        JSValue *result = [function callWithArguments:@[@5]];
+        NSLog(@"factorial(5) = %d",[result toInt32]);
+        ```
+        
+   JS与OC的交互：
+      JS与OC的交互主要是通过两种方式：
+      1.Block： 第一种方式是使用block,block 也可以称作闭包函数，使用block可以很方便的将OC中的单个方法暴露给js调用。
+      2.JSExport 协议。  
+      
+    - WebViewJavascriptBridge
+        - WebViewJavascriptBridge的使用
+            - JS调用OC
+                首先需要在OC中注册JS可以调用的方法,registerHandle: 注册，然后JS中调用
+            - OC调用JS
+                首先JS中得注册OC可以调用的方法，然后OC代码中通过 callHandle调用
+        - WebViewJavascriptBridge的原理
+
+- 6.常见的crash有哪些类型？怎么样处理预防？
+    - UI非主线程刷新
+    - KVO非对称添加删除
+    - unrecognized selector
+    - 数组（不可变字典进行更改，数组越界，）
+    - 字典（不可变字典添加key-value， key 为nil）
+    - 字符串
+    
+    1.UI非主线程刷新。
+        当我们在子线程中进行了一些操作后想要刷新UI,但是没有切换线程的操作，例如：在子线程中发送通知，在主线程收到后需的操作其实也是子线程中进行的。即：接受通知后的操作是与发送通知所在的线程是同一个线程。
+        可进行的预防措施有:利用runtime，hook view的setNeedsLayout、setNeedsDisplay、setNeedsDisplayInRect、setNeedsUpdateConstraints四个方法，判断当前是否是主线程，如果不是主线程，则跳转到dispatch_get_main_queue 执行。
+    
+    
+    
+    
+  
     
 
 
