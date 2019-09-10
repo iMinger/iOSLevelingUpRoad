@@ -309,7 +309,7 @@ source1 中有一个mach_port_t,这个mach_port 是用于内核向线程发送�
 
 使用Source1的情况：
     - 基于端口的线程间通信（A线程通过端口发送消息给B线程，这个消息是Source1的）；
-    - 系统事件的捕获，以点击屏幕事件为例，我们点击屏幕到系统捕捉这个点击事件是 Source1,接着分发到Source0 去处理这个事件。 
+    - 系统事件的捕获，以按钮点击触发事件为例，点击屏幕的时候，首先系统内部捕获到这个点击事件，这是在Source1中处理的，Source1会包装成事件丢到事件队列中，交给Source0处理。 
 
 
 其中有两个字段version0 和 version1 对应着source0 和 source1.
@@ -319,6 +319,19 @@ source1 中有一个mach_port_t,这个mach_port 是用于内核向线程发送�
 
 #### 1.Source0 : 非基于Port(端口)的,是用户主动触发的事件，如触摸事件，performSelectors
 #### 2.Source1 ：基于Port (端口的)的线程间通信
+
+## RunLoop与AutoReleasePool
+在程序启动之后，主线程会创建一个autoReleasePool,也会创建两个Observer，回调工作都是在_wrapRunLoopWithAutoreleasePoolHandler函数中。
+
+第一个Observer监听的是Entry（即将进入RunLoop），回调是在_objc_autoreleasePoolPush()中创建自动释放池的，优先级是最高的，保证创建释放池是在所有回调之前。
+
+第二个Observer监听有两个时间:BeforeWaiting（进入休眠）时调用_objc_autoreleasePoolPop 和 _objc_autoreleasePoolPush 释放旧的释放池以及创建新的释放池；Exit（退出RunLoop） 调用_autoreleasePoolPop 来释放自动释放池。这个优先级是最低的，保证释放池发生在所有回调之后调用。
+
+## 实现线程保活/ 控制线程生命周期
+## RunLoop的运行过程/内部实现
+将下面这张图深深地刻在自己的骨子里
+![image](https://github.com/iMinger/iOSLevelingUpRoad/raw/master/ReadingSourceCode/objc4/src/RunLoopActivity.png)
+
 
 
 
