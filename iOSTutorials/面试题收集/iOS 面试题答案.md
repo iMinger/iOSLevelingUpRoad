@@ -243,6 +243,7 @@ same thread in which an observer registered itself.
         当我们在子线程中进行了一些操作后想要刷新UI,但是没有切换线程的操作，例如：在子线程中发送通知，在主线程收到后需的操作其实也是子线程中进行的。即：接受通知后的操作是与发送通知所在的线程是同一个线程。
         可进行的预防措施有:利用runtime，hook view的setNeedsLayout、setNeedsDisplay、setNeedsDisplayInRect、setNeedsUpdateConstraints四个方法，判断当前是否是主线程，如果不是主线程，则跳转到dispatch_get_main_queue 执行。
     
+- 7.事件的响应链与传递链。
     
     
     
@@ -252,4 +253,35 @@ same thread in which an observer registered itself.
 
 #数据结构与算法
 - 1.单链表的反转
+    分为迭代法和递归法；
+    - 迭代法
+        思路：1->2->3->4->5->NULL  change: NULL<-1<-2<-3<-4<-5
+        把指针反向指就可以了，需要三个指针，preNode,currNode,nextNode,
+        1.先保存前一个节点preNode，再将当前一个节点currNode的next指针设为前一个节点preNode
+        2.然后当前节点就作为前一个节点，继续迭代。
+        ```
+        struct ListNode * reverseList(struct ListNode *head) {
+            if (head == NULL) return head;
+            struct ListNode *pre = NULL;
+            struct ListNode *curr = head;
+            struct ListNode *next = NULL;
+            
+            while(curr) {
+                //1。首先要保存一下下一个要进行遍历的Node节点，防止curr->next 指针指向别的节点后，找不到下一个要遍历的node节点
+                next = curr->next;
+                //2. 将curr->next 指针指向上一个节点，进行链表的反转
+                curr->next = pre;
+                //3.4 步将pre和curr节点后移一个节点，进行下一次的遍历。
+                pre = curr;
+                curr = next;
+            }
+            
+            // 循环结束，curr == NULL
+            // pre 即最后一个节点，也就是新的头节点。
+            return pre;
+        }
+        ```
+    - 递归法
 - 2.判断一个单链表是否有环。
+    快慢指针，快指针一次走两步，慢指针一次走一步，如果有环，那么最终快指针和满指针将会指向同一个node
+- 3.十大排序算法。
