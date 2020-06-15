@@ -8,7 +8,11 @@ FBKVOController 代码结构如下：
 ![KVOController_sourcefile](https://gitee.com/iminger/CommonImage/raw/master/MarkDown_image/FBKVOController/KVOController_sourcefile.png)
 
 这个库中一共有 5 个类，一个头文件类`KVOController.h`，其中共引入了连个头文件
-![8f3acbc0ce453a594aff5f0ba3555ec5.png](evernotecid://0F9C3E48-DD6A-49F2-B223-09C4CBC87201/appyinxiangcom/11847268/ENResource/p107)
+
+``` objc
+#import <KVOController/FBKVOController.h>
+#import <KVOController/NSObject+FBKVOController.h>
+```
 
 一个 `NSObject+FBKVOController.h` NSObject 分类，给所有 NSObject 类添加了一些语法糖,都可以调用KVOController和KVOControllerNonRetaining 属性.调用时,如果没有值则创建一个实例保存起来并返回该值.
 
