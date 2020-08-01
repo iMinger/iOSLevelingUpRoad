@@ -1,6 +1,16 @@
 # iOSLevelingUpRoad
 
-in here, I will record my way for iOS leveling up.
+仅做总结归纳使用。
+
+## 知识大纲
+- 基础
+    - 语言
+        - C
+        - Objective-C
+        - Swift
+    - 内存管理
+    - 多线程
+    - 
 
 Thanks for [ShannonChen](https://github.com/ShannonChenCHN), I got the idea when I saw his repository [iOSDevLevelingUp](https://github.com/ShannonChenCHN/iOSDevLevelingUp).
 
