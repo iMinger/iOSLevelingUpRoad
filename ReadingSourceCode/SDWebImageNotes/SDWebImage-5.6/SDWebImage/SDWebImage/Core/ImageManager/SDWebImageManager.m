@@ -140,6 +140,7 @@ static id<SDImageLoader> _defaultImageLoader;
     return [self loadImageWithURL:url options:options context:nil progress:progressBlock completed:completedBlock];
 }
 
+// step3: 外部通过调用manger 的该方法来获取图片，具体是从缓存中获取还是从网络获取，根据url来判断。
 - (SDWebImageCombinedOperation *)loadImageWithURL:(nullable NSURL *)url
                                           options:(SDWebImageOptions)options
                                           context:(nullable SDWebImageContext *)context
@@ -278,6 +279,8 @@ static id<SDImageLoader> _defaultImageLoader;
             context = [mutableContext copy];
         }
         
+        // step6: 请求网络 requestImage(url, options,context, progress, completed)
+        // step7: network result 返回
         @weakify(operation);
         operation.loaderOperation = [imageLoader requestImageWithURL:url options:options context:context progress:progressBlock completed:^(UIImage *downloadedImage, NSData *downloadedData, NSError *error, BOOL finished) {
             @strongify(operation);
@@ -455,6 +458,8 @@ static id<SDImageLoader> _defaultImageLoader;
     }
     BOOL waitStoreCache = SD_OPTIONS_CONTAINS(options, SDWebImageWaitStoreCache);
     // Check whether we should wait the store cache finished. If not, callback immediately
+    // step8: 存储图片 去调用SDImageCache(SDImageCache) 分类方法 storeImage:imageDate:forkey:cacheType:options:context
+    
     [imageCache storeImage:image imageData:data forKey:key cacheType:cacheType completion:^{
         if (waitStoreCache) {
             if (completion) {
@@ -476,6 +481,8 @@ static id<SDImageLoader> _defaultImageLoader;
     [self callCompletionBlockForOperation:operation completion:completionBlock image:nil data:nil error:error cacheType:SDImageCacheTypeNone finished:YES url:url];
 }
 
+
+// step9: 将image 通过block回调
 - (void)callCompletionBlockForOperation:(nullable SDWebImageCombinedOperation*)operation
                              completion:(nullable SDInternalCompletionBlock)completionBlock
                                   image:(nullable UIImage *)image

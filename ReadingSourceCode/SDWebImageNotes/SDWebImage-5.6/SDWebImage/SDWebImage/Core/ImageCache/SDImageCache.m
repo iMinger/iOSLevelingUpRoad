@@ -165,6 +165,9 @@
     return [self storeImage:image imageData:imageData forKey:key toMemory:YES toDisk:toDisk completion:completionBlock];
 }
 
+
+// step8:最终 存储图片 storeImage:imageDate:forkey:toMemory:toDisk:completion
+// SDImageCache(SDImageCache)中 调用本类 storeImage:imageDate:forkey:toMemory:toDisk:completion来操作。
 - (void)storeImage:(nullable UIImage *)image
          imageData:(nullable NSData *)imageData
             forKey:(nullable NSString *)key
@@ -698,6 +701,9 @@
 
 #pragma mark - SDImageCache
 
+// step4: SDWebImageManger 通过调用 SDImageCache的queryImage(key,options,context,completionBlock) 来获取缓存图片
+
+// step5: 缓存中和硬盘中的图片回调结果，如果没找到，则走step6: 从downloader中下载图片
 - (id<SDWebImageOperation>)queryImageForKey:(NSString *)key options:(SDWebImageOptions)options context:(nullable SDWebImageContext *)context completion:(nullable SDImageCacheQueryCompletionBlock)completionBlock {
     SDImageCacheOptions cacheOptions = 0;
     if (options & SDWebImageQueryMemoryData) cacheOptions |= SDImageCacheQueryMemoryData;
@@ -712,6 +718,8 @@
     return [self queryCacheOperationForKey:key options:cacheOptions context:context done:completionBlock];
 }
 
+// step8: 存储图片 storeImage:imageDate:forkey:cacheType:options:context
+// SDImageCachesManager 调用 SDImageCache(SDImageCache) 分类来操作。
 - (void)storeImage:(UIImage *)image imageData:(NSData *)imageData forKey:(nullable NSString *)key cacheType:(SDImageCacheType)cacheType completion:(nullable SDWebImageNoParamsBlock)completionBlock {
     switch (cacheType) {
         case SDImageCacheTypeNone: {

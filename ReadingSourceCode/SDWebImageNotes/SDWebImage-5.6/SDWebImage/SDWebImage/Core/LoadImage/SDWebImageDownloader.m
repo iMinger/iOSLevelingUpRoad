@@ -567,6 +567,7 @@ didReceiveResponse:(NSURLResponse *)response
     return YES;
 }
 
+/// step6: 如果在cache 中没有找到缓存图片，那么就在SDWebImageManger 中调用 requestImage(url,options,context,progress,completed) 来请求网络图片
 - (id<SDWebImageOperation>)requestImageWithURL:(NSURL *)url options:(SDWebImageOptions)options context:(SDWebImageContext *)context progress:(SDImageLoaderProgressBlock)progressBlock completed:(SDImageLoaderCompletedBlock)completedBlock {
     UIImage *cachedImage = context[SDWebImageContextLoaderCachedImage];
     
