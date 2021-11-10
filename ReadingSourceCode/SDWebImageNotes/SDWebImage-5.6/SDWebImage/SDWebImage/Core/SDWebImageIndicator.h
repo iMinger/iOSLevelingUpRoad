@@ -6,6 +6,9 @@
  * file that was distributed with this source code.
  */
 
+// 加载指示器
+
+
 #import "SDWebImageCompat.h"
 
 #if SD_UIKIT || SD_MAC

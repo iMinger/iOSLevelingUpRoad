@@ -7,6 +7,7 @@
  * file that was distributed with this source code.
  */
 
+// 该类定义SDWebImage 中遇到的error 类型
 #import "SDWebImageCompat.h"
 
 FOUNDATION_EXPORT NSErrorDomain const _Nonnull SDWebImageErrorDomain;

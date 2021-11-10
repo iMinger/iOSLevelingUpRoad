@@ -6,6 +6,10 @@
  * file that was distributed with this source code.
  */
 
+
+// 该类中定义一些常量、enum 、方法等
+
+
 #import "SDWebImageCompat.h"
 
 typedef void(^SDWebImageNoParamsBlock)(void);

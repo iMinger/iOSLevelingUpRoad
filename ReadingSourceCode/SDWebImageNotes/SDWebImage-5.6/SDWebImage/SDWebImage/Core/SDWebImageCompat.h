@@ -7,6 +7,8 @@
  * file that was distributed with this source code.
  */
 
+// compat 兼容， 该文件代表多平台兼容所做的一些列操作
+
 #import <TargetConditionals.h>
 
 #ifdef __OBJC_GC__

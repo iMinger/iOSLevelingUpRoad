@@ -6,6 +6,8 @@
  * file that was distributed with this source code.
  */
 
+// image transition
+
 #import "SDWebImageCompat.h"
 
 #if SD_UIKIT || SD_MAC
