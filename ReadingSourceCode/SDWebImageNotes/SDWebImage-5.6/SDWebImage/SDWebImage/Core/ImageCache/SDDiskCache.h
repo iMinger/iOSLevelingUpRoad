@@ -99,6 +99,8 @@
  @param key A string identifying the value
  @return The cache path for key. Or nil if the key can not associate to a path
  */
+
+// 外部通过调用该方法来获取cachePath 路径
 - (nullable NSString *)cachePathForKey:(nonnull NSString *)key;
 
 /**

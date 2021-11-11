@@ -98,6 +98,7 @@ static id<SDImageLoader> _defaultImageLoader;
     return [self cacheKeyForURL:url context:nil];
 }
 
+// 获取缓存key
 - (nullable NSString *)cacheKeyForURL:(nullable NSURL *)url context:(nullable SDWebImageContext *)context {
     if (!url) {
         return @"";
@@ -109,9 +110,12 @@ static id<SDImageLoader> _defaultImageLoader;
     if (context[SDWebImageContextCacheKeyFilter]) {
         cacheKeyFilter = context[SDWebImageContextCacheKeyFilter];
     }
+    
+    // 如果设置了cacheKeyFilter 对象，那么就由cacheKeyFilter 对象来过滤并返回key
     if (cacheKeyFilter) {
         key = [cacheKeyFilter cacheKeyForURL:url];
     } else {
+        // 否则，key默认为url字符串
         key = url.absoluteString;
     }
     // Thumbnail Key Appending
@@ -151,11 +155,13 @@ static id<SDImageLoader> _defaultImageLoader;
 
     // Very common mistake is to send the URL using NSString object instead of NSURL. For some strange reason, Xcode won't
     // throw any warning for this type mismatch. Here we failsafe this error by allowing URLs to be passed as NSString.
+    // 这里做一下保护将string 转 url
     if ([url isKindOfClass:NSString.class]) {
         url = [NSURL URLWithString:(NSString *)url];
     }
 
     // Prevents app crashing on argument type error like sending NSNull instead of NSURL
+    // 这里做一下保护，防止出现 NUNull
     if (![url isKindOfClass:NSURL.class]) {
         url = nil;
     }
@@ -165,6 +171,10 @@ static id<SDImageLoader> _defaultImageLoader;
 
     BOOL isFailedUrl = NO;
     if (url) {
+        // 看一下这里加锁，和加锁的方式，对于YYKit 中的加锁方式。
+        // 这里是使用  dispatch_semaphore_t 信号量 来确保线程安全的。
+        // dispatch_semaphore_wait 信号量+1  dispatch_semaphore_signal 信号量-1
+        // 当信号量为0时，才可以通过执行，否则等待
         SD_LOCK(self.failedURLsLock);
         isFailedUrl = [self.failedURLs containsObject:url];
         SD_UNLOCK(self.failedURLsLock);
@@ -175,6 +185,7 @@ static id<SDImageLoader> _defaultImageLoader;
         return operation;
     }
 
+    // 这里加锁，将operation 加入到当前正在执行的操作的数组中， 线程安全
     SD_LOCK(self.runningOperationsLock);
     [self.runningOperations addObject:operation];
     SD_UNLOCK(self.runningOperationsLock);
@@ -212,6 +223,8 @@ static id<SDImageLoader> _defaultImageLoader;
                              context:(nullable SDWebImageContext *)context
                             progress:(nullable SDImageLoaderProgressBlock)progressBlock
                            completed:(nullable SDInternalCompletionBlock)completedBlock {
+    
+    // 获取imageCache 对象
     // Grab the image cache to use
     id<SDImageCache> imageCache;
     if ([context[SDWebImageContextImageCache] conformsToProtocol:@protocol(SDImageCache)]) {
@@ -219,11 +232,17 @@ static id<SDImageLoader> _defaultImageLoader;
     } else {
         imageCache = self.imageCache;
     }
+    
     // Check whether we should query cache
+    // 是否需要查询缓存
     BOOL shouldQueryCache = !SD_OPTIONS_CONTAINS(options, SDWebImageFromLoaderOnly);
     if (shouldQueryCache) {
+        
+        // 获取缓存key
         NSString *key = [self cacheKeyForURL:url context:context];
         @weakify(operation);
+        
+        // 通过 imageCache 对象的 queryImage(key, options, context, completion) 方法来查询缓存，并返回一个 id<SDWebImageOperation> 操作对象，将该对象赋值给 SDWebImageCombinedOperation 组合对象中的 cacheOperation
         operation.cacheOperation = [imageCache queryImageForKey:key options:options context:context completion:^(UIImage * _Nullable cachedImage, NSData * _Nullable cachedData, SDImageCacheType cacheType) {
             @strongify(operation);
             if (!operation || operation.isCancelled) {

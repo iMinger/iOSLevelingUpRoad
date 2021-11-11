@@ -116,6 +116,8 @@ inline UIImage * _Nullable SDScaledImageForScaleFactor(CGFloat scale, UIImage * 
     return scaledImage;
 }
 
+
+// 这里定义了SDWebImageContext 字典中的所有的key
 #pragma mark - Context option
 
 SDWebImageContextOption const SDWebImageContextSetImageOperationKey = @"setImageOperationKey";

@@ -28,6 +28,7 @@
 @end
 
 
+// SDImageCache 类是一个单例类
 @implementation SDImageCache
 
 #pragma mark - Singleton, init, dealloc
@@ -115,6 +116,7 @@
 
 #pragma mark - Cache paths
 
+// 通过SDImageCache 类查看 cachePath, 内部是调用 diskCache 对象调用 cachePathForKey 方法获得
 - (nullable NSString *)cachePathForKey:(nullable NSString *)key {
     if (!key) {
         return nil;
@@ -330,6 +332,8 @@
 }
 
 - (nullable UIImage *)imageFromMemoryCacheForKey:(nullable NSString *)key {
+    // memoryCache 实现了SDMemoryCache 中的 objectForKey 方法，而不是说memoryCache 是一个字典。
+    // 采用协议化之后，真正用来memoryCache的部分我们可以用YYCache等其他Cache方法实现。
     return [self.memoryCache objectForKey:key];
 }
 
@@ -428,6 +432,9 @@
     return [self queryCacheOperationForKey:key options:options context:nil done:doneBlock];
 }
 
+
+// step 4.1 查找缓存的核心方法
+// 整体分为两部分： 从memory 中查找 和 从disk中查找
 - (nullable NSOperation *)queryCacheOperationForKey:(nullable NSString *)key options:(SDImageCacheOptions)options context:(nullable SDWebImageContext *)context done:(nullable SDImageCacheQueryCompletionBlock)doneBlock {
     if (!key) {
         if (doneBlock) {
@@ -436,6 +443,7 @@
         return nil;
     }
     
+    // 如果有变换图片的参数，那么key也需要变换
     id<SDImageTransformer> transformer = context[SDWebImageContextImageTransformer];
     if (transformer) {
         // grab the transformed disk image if transformer provided
@@ -443,6 +451,8 @@
         key = SDTransformedKeyForKey(key, transformerKey);
     }
     
+    // 一个很经典的面试题：SDWebImage 从内存中获取图片缓存的key就是url字符串
+    // 而从disk中获取图片缓存的key 是经过md5 转义的字符串
     // First check the in-memory cache...
     UIImage *image = [self imageFromMemoryCacheForKey:key];
     
@@ -469,6 +479,8 @@
 
     BOOL shouldQueryMemoryOnly = (image && !(options & SDImageCacheQueryMemoryData));
     if (shouldQueryMemoryOnly) {
+        
+        // step5: 将memory or disk image 回调，如果没找到，则走step6: 从downloader中下载图片
         if (doneBlock) {
             doneBlock(image, nil, SDImageCacheTypeMemory);
         }
@@ -508,6 +520,7 @@
                 }
             }
             
+            // step5: 将memory or disk image 回调，如果没找到，则走step6: 从downloader中下载图片
             if (doneBlock) {
                 if (shouldQueryDiskSync) {
                     doneBlock(diskImage, diskData, cacheType);
@@ -697,13 +710,14 @@
 
 @end
 
+
+// SDImageCache+SDImageCache  分类，同时还实现了SDImageCache 协议
+// 对cache 进行相关操作的API 都被封装在 SDImageCache 协议中，这里是在SDImageCache+SDImageCache 分类中实现该协议。
 @implementation SDImageCache (SDImageCache)
 
 #pragma mark - SDImageCache
 
 // step4: SDWebImageManger 通过调用 SDImageCache的queryImage(key,options,context,completionBlock) 来获取缓存图片
-
-// step5: 缓存中和硬盘中的图片回调结果，如果没找到，则走step6: 从downloader中下载图片
 - (id<SDWebImageOperation>)queryImageForKey:(NSString *)key options:(SDWebImageOptions)options context:(nullable SDWebImageContext *)context completion:(nullable SDImageCacheQueryCompletionBlock)completionBlock {
     SDImageCacheOptions cacheOptions = 0;
     if (options & SDWebImageQueryMemoryData) cacheOptions |= SDImageCacheQueryMemoryData;

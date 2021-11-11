@@ -230,6 +230,7 @@ static NSString * const SDDiskCacheExtendedAttributeName = @"com.hackemist.SDDis
     }
 }
 
+//该接口供外部使用：根据key转换到具体保存的文件名： md5+文件扩展名
 - (nullable NSString *)cachePathForKey:(NSString *)key {
     NSParameterAssert(key);
     return [self cachePathForKey:key inPath:self.diskCachePath];
@@ -303,6 +304,8 @@ static NSString * const SDDiskCacheExtendedAttributeName = @"com.hackemist.SDDis
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
+// 获取单独文件的路径，这里对URL做了一个MD5加密+扩展名作为文件名
 static inline NSString * _Nonnull SDDiskCacheFileNameForKey(NSString * _Nullable key) {
     const char *str = key.UTF8String;
     if (str == NULL) {

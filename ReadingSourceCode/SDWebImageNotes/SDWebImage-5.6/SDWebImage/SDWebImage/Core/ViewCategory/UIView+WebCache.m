@@ -54,21 +54,28 @@ const int64_t SDWebImageProgressUnitCountUnknown = 1LL;
                      setImageBlock:(nullable SDSetImageBlock)setImageBlock
                           progress:(nullable SDImageLoaderProgressBlock)progressBlock
                          completed:(nullable SDInternalCompletionBlock)completedBlock {
+    // 这里用 copy 操作来避免可变对象
     context = [context copy]; // copy to avoid mutable object
+    
+    // 下面这三四行代码是确定本次请求加载图片操作的 key, 这个key很重要，用于标记本次operation操作，放入 SDOperationsDictionary 弱引用字典中(NSMapTable,该数据结构类型对其中的每一个value都是weak引用，不会引用计数+1)，当下次同样一个UIImageView 进行网络请求的时候，可以先将上次的请求cancel 掉，重新开始新的operation 操作。
     NSString *validOperationKey = context[SDWebImageContextSetImageOperationKey];
     if (!validOperationKey) {
         validOperationKey = NSStringFromClass([self class]);
     }
     self.sd_latestOperationKey = validOperationKey;
+    
+    // 这里先cancel 掉之前的还没进行完的 validOperationKey的 operation 线程。方便下面开启新的请求线程。
     [self sd_cancelImageLoadOperationWithKey:validOperationKey];
     self.sd_imageURL = url;
     
+    // 这里如果没有设置延迟展示placeholder，那么就立刻先将placeholder展示在图上
     if (!(options & SDWebImageDelayPlaceholder)) {
         dispatch_main_async_safe(^{
             [self sd_setImage:placeholder imageData:nil basedOnClassOrViaCustomSetImageBlock:setImageBlock cacheType:SDImageCacheTypeNone imageURL:url];
         });
     }
     
+    // 当url存在时，开始正常图片加载流程
     if (url) {
         // reset the progress
         NSProgress *imageProgress = objc_getAssociatedObject(self, @selector(sd_imageProgress));
@@ -82,6 +89,7 @@ const int64_t SDWebImageProgressUnitCountUnknown = 1LL;
         [self sd_startImageIndicator];
         id<SDWebImageIndicator> imageIndicator = self.sd_imageIndicator;
 #endif
+        
         SDWebImageManager *manager = context[SDWebImageContextCustomManager];
         if (!manager) {
             manager = [SDWebImageManager sharedManager];
@@ -93,6 +101,8 @@ const int64_t SDWebImageProgressUnitCountUnknown = 1LL;
                 imageProgress.completedUnitCount = receivedSize;
             }
 #if SD_UIKIT || SD_MAC
+            
+            // 这里判断如果图片指示器实现了 updateIndicatorProgress 更新进度的方法时，要进行更新进度的操作。
             if ([imageIndicator respondsToSelector:@selector(updateIndicatorProgress:)]) {
                 double progress = 0;
                 if (expectedSize != 0) {
@@ -104,6 +114,7 @@ const int64_t SDWebImageProgressUnitCountUnknown = 1LL;
                 });
             }
 #endif
+            // 进度回调block
             if (progressBlock) {
                 progressBlock(receivedSize, expectedSize, targetURL);
             }
@@ -176,6 +187,10 @@ const int64_t SDWebImageProgressUnitCountUnknown = 1LL;
                 callCompletedBlockClojure();
             });
         }];
+        
+        // 这一步操作是将本次加载图片的operation 操作放入到字典中，方便下次同样key的加载时，先将本次操作取消，然后进行下次新的操作。
+        // SDOperationsDictionary这是一个 NSMapTable,对其中的value是weak弱引用，不会造成引用计数器+1
+        
         [self sd_setImageLoadOperation:operation forKey:validOperationKey];
     } else {
 #if SD_UIKIT || SD_MAC
@@ -336,11 +351,13 @@ const int64_t SDWebImageProgressUnitCountUnknown = 1LL;
     [self addSubview:view];
 }
 
+// 可以看到，5.0 之后的版本都在转向面向协议，我们可以自定义Indicator,只要遵循 SDWebImageIndicator 并实现其中的方法即可，方便灵活
 - (void)sd_startImageIndicator {
     id<SDWebImageIndicator> imageIndicator = self.sd_imageIndicator;
     if (!imageIndicator) {
         return;
     }
+    /// 这里在开始指示器动画时要保证时处于主线程上。
     dispatch_main_async_safe(^{
         [imageIndicator startAnimatingIndicator];
     });

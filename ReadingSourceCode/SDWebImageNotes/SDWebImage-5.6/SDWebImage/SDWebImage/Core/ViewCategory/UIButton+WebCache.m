@@ -85,6 +85,7 @@ static inline NSString * backgroundImageOperationKeyForState(UIControlState stat
     [self sd_setImageWithURL:url forState:state placeholderImage:placeholder options:options context:nil progress:progressBlock completed:completedBlock];
 }
 
+// Step1: UIButton对象调用该方法开始加载图片
 - (void)sd_setImageWithURL:(nullable NSURL *)url
                   forState:(UIControlState)state
           placeholderImage:(nullable UIImage *)placeholder
