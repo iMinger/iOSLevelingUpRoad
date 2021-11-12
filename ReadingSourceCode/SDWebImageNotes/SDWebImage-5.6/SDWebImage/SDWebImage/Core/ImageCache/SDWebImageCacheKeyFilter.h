@@ -6,6 +6,12 @@
  * file that was distributed with this source code.
  */
 
+// 声明一个    SDWebImageCacheKeyFilter 协议，里面定义一些要实现的方法
+// 然后声明一个 SDWebImageCacheKeyFilter 同名实体类，实现SDWebImageCacheKeyFilter协议中的方法。体会一下这样做的好处，可参考NSObject.
+
+// 我们可以新创建一个类 遵循 SDWebImageCacheKeyFilter 协议并实现其中的 cacheKeyForURL 方法，来自定义cacheKey 的生成。
+
+
 #import <Foundation/Foundation.h>
 #import "SDWebImageCompat.h"
 

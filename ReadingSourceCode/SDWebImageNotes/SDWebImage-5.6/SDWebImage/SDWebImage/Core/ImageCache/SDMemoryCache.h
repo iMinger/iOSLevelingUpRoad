@@ -6,6 +6,14 @@
  * file that was distributed with this source code.
  */
 
+
+/*
+ 方式一： 声明一个 SDMemoryCache 协议，定义一些方法和属性，然后创建一个同名协议的实体类，并遵循该协议。
+ 
+ 方式二： 直接创建一个 SDMemoryCache 类，将 抽离出SDMemoryCache协议中的方法再合并到SDMemoryCache 中去。
+ 
+ 上面两个方式进行对比会发现：方式二不利于扩展和自定义，方式一是在方式二的基础上，将一些核心关键操作抽离出来声明一个协议，然后方便调用自定义一个新的SDMemoryCache类并有其单独实现。
+ */
 #import "SDWebImageCompat.h"
 
 @class SDImageCacheConfig;

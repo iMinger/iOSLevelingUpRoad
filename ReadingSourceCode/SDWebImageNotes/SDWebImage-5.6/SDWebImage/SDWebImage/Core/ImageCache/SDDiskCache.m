@@ -98,6 +98,7 @@ static NSString * const SDDiskCacheExtendedAttributeName = @"com.hackemist.SDDis
     }
 }
 
+// 获取扩展二进制数据
 - (NSData *)extendedDataForKey:(NSString *)key {
     NSParameterAssert(key);
     

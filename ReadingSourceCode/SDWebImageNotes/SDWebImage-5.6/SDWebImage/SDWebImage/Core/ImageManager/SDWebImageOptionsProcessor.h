@@ -40,6 +40,15 @@ typedef SDWebImageOptionsResult * _Nullable(^SDWebImageOptionsProcessorBlock)(NS
 
 @end
 
+/*
+ SDWebImageOptionsProcessor 协议，该协议用于Options 操作者
+ Options 操作者可以用来控制单独的图片请求参数中 SDWebImageOptions 和 SDWebImageContext的最终结果。
+ 实现该协议用来有一个全局控制对每一个图片请求的option
+ 
+ 该方式同 SDWebImageCacheKeyFilter 和 SDWebImageCacheSerializer 的使用和实现一致。
+ */
+
+
 /**
  This is the protocol for options processor.
  Options processor can be used, to control the final result for individual image request's `SDWebImageOptions` and `SDWebImageContext`

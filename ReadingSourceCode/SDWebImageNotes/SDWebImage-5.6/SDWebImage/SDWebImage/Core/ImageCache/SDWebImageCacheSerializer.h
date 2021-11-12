@@ -6,6 +6,9 @@
  * file that was distributed with this source code.
  */
 
+
+// 声明一个 SDWebImageCacheSerializer 缓存序列化的协议，然后创建一个同名实体类，并遵循和实现该协议，NSObject 也是这样做的。
+
 #import <Foundation/Foundation.h>
 #import "SDWebImageCompat.h"
 

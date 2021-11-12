@@ -389,6 +389,7 @@
     return [self diskImageForKey:key data:data options:0 context:nil];
 }
 
+// 根据二进制数据进行解码得到UIImage 对象
 - (nullable UIImage *)diskImageForKey:(nullable NSString *)key data:(nullable NSData *)data options:(SDImageCacheOptions)options context:(SDWebImageContext *)context {
     if (data) {
         UIImage *image = SDImageCacheDecodeImageData(data, key, [[self class] imageOptionsFromCacheOptions:options], context);
@@ -433,7 +434,7 @@
 }
 
 
-// step 4.1 查找缓存的核心方法
+// step4.1 查找缓存的核心方法
 // 整体分为两部分： 从memory 中查找 和 从disk中查找
 - (nullable NSOperation *)queryCacheOperationForKey:(nullable NSString *)key options:(SDImageCacheOptions)options context:(nullable SDWebImageContext *)context done:(nullable SDImageCacheQueryCompletionBlock)doneBlock {
     if (!key) {
@@ -452,7 +453,7 @@
     }
     
     // 一个很经典的面试题：SDWebImage 从内存中获取图片缓存的key就是url字符串
-    // 而从disk中获取图片缓存的key 是经过md5 转义的字符串
+    // 而从disk中获取图片缓存的key 是经过md5 转义的字符串，因为保存图片的文件名就是url进行md5转义+扩展得到的
     // First check the in-memory cache...
     UIImage *image = [self imageFromMemoryCacheForKey:key];
     
@@ -478,6 +479,7 @@
     }
 
     BOOL shouldQueryMemoryOnly = (image && !(options & SDImageCacheQueryMemoryData));
+    // 如果设定了只从缓存中获取，那么直接将缓存图片返回，
     if (shouldQueryMemoryOnly) {
         
         // step5: 将memory or disk image 回调，如果没找到，则走step6: 从downloader中下载图片
@@ -494,7 +496,10 @@
     // 2. in-memory cache miss & diskDataSync
     BOOL shouldQueryDiskSync = ((image && options & SDImageCacheQueryMemoryDataSync) ||
                                 (!image && options & SDImageCacheQueryDiskDataSync));
+    // 定义一个block块，方便下面两个地方调用
     void(^queryDiskBlock)(void) =  ^{
+        
+        // 该block捕获了 operation 对象，当 operation 对象被设置为cancel 是，直接block返回。
         if (operation.isCancelled) {
             if (doneBlock) {
                 doneBlock(nil, nil, SDImageCacheTypeNone);
@@ -503,6 +508,9 @@
         }
         
         @autoreleasepool {
+            // 根据key获取到磁盘上的二进制数据
+            // 这里没有像获取内存缓存一样使用 imageFromDiskCacheForKey() 来获取diskImage,是因为 doneBlock(image, imageData, cacheType) 回调中有 imageData 这个参数。
+            // imageFromDiskCacheForKey() 中也是现获取二进制data,然后调用 `diskImageForKey:data:option:context` 来进行解码生成图片
             NSData *diskData = [self diskImageDataBySearchingAllPathsForKey:key];
             UIImage *diskImage;
             SDImageCacheType cacheType = SDImageCacheTypeNone;
@@ -513,7 +521,9 @@
             } else if (diskData) {
                 cacheType = SDImageCacheTypeDisk;
                 // decode image data only if in-memory cache missed
+                // 根据磁盘二进制数据解码生成UIImage 对象
                 diskImage = [self diskImageForKey:key data:diskData options:options context:context];
+                // 将磁盘数据生成的 image 对象保存到内存缓存中，方便下次直接从缓存中读取
                 if (diskImage && self.config.shouldCacheImagesInMemory) {
                     NSUInteger cost = diskImage.sd_memoryCost;
                     [self.memoryCache setObject:diskImage forKey:key cost:cost];
@@ -534,6 +544,7 @@
     };
     
     // Query in ioQueue to keep IO-safe
+    // 在io 线程中去查看disk 保持IO 安全
     if (shouldQueryDiskSync) {
         dispatch_sync(self.ioQueue, queryDiskBlock);
     } else {

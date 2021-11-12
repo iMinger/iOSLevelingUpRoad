@@ -6,6 +6,10 @@
  * file that was distributed with this source code.
  */
 
+/*
+ SDWebImageCacheConfig 缓存相关配置类
+ */
+
 #import <Foundation/Foundation.h>
 #import "SDWebImageCompat.h"
 

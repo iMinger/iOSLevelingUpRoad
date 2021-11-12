@@ -166,6 +166,7 @@ static id<SDImageLoader> _defaultImageLoader;
         url = nil;
     }
 
+    // 每次loadImage 都会创建一个新的operation 操作对象，方便后续进行cancel操作
     SDWebImageCombinedOperation *operation = [SDWebImageCombinedOperation new];
     operation.manager = self;
 
@@ -270,6 +271,7 @@ static id<SDImageLoader> _defaultImageLoader;
                               cacheType:(SDImageCacheType)cacheType
                                progress:(nullable SDImageLoaderProgressBlock)progressBlock
                               completed:(nullable SDInternalCompletionBlock)completedBlock {
+    // 获取 image loader 对象来使用
     // Grab the image loader to use
     id<SDImageLoader> imageLoader;
     if ([context[SDWebImageContextImageLoader] conformsToProtocol:@protocol(SDImageLoader)]) {
@@ -282,6 +284,7 @@ static id<SDImageLoader> _defaultImageLoader;
     shouldDownload &= (!cachedImage || options & SDWebImageRefreshCached);
     shouldDownload &= (![self.delegate respondsToSelector:@selector(imageManager:shouldDownloadImageForURL:)] || [self.delegate imageManager:self shouldDownloadImageForURL:url]);
     shouldDownload &= [imageLoader canRequestImageForURL:url];
+    
     if (shouldDownload) {
         if (cachedImage && options & SDWebImageRefreshCached) {
             // If image was found in the cache but SDWebImageRefreshCached is provided, notify about the cached image

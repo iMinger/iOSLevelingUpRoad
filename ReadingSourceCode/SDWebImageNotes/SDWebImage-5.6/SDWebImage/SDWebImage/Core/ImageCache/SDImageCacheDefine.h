@@ -17,22 +17,22 @@ typedef NS_ENUM(NSInteger, SDImageCacheType) {
      * For query and contains op in response, means the image isn't available in the image cache
      * For op in request, this type is not available and take no effect.
      */
-    SDImageCacheTypeNone,
+    SDImageCacheTypeNone,  // 没有缓存
     /**
      * For query and contains op in response, means the image was obtained from the disk cache.
      * For op in request, means process only disk cache.
      */
-    SDImageCacheTypeDisk,
+    SDImageCacheTypeDisk, // 磁盘缓存类型
     /**
      * For query and contains op in response, means the image was obtained from the memory cache.
      * For op in request, means process only memory cache.
      */
-    SDImageCacheTypeMemory,
+    SDImageCacheTypeMemory, // 内存缓存类型
     /**
      * For query and contains op in response, this type is not available and take no effect.
      * For op in request, means process both memory cache and disk cache.
      */
-    SDImageCacheTypeAll
+    SDImageCacheTypeAll  // 同时内存和磁盘缓存
 };
 
 typedef void(^SDImageCacheCheckCompletionBlock)(BOOL isInCache);
@@ -52,6 +52,17 @@ typedef void(^SDImageCacheContainsCompletionBlock)(SDImageCacheType containsCach
  @return The decoded image for current image data query from cache
  */
 FOUNDATION_EXPORT UIImage * _Nullable SDImageCacheDecodeImageData(NSData * _Nonnull imageData, NSString * _Nonnull cacheKey, SDWebImageOptions options, SDWebImageContext * _Nullable context);
+
+
+
+/*
+ SDImageCache 协议，抽象剥离了图片缓存相关的方法，在使用自定义图片缓存策略时，只需要实现下面的几个接口API接口，缓存机制可自定义。
+ queryImage:  查找图片缓存
+ storeImage:  保存图片缓存
+ removeImage: 删除图片缓存
+ containsImage: 检测是否已经有某个key的图片缓存
+ clear:       清除所有图片缓存
+ */
 
 /**
  This is the image cache protocol to provide custom image cache for `SDWebImageManager`.

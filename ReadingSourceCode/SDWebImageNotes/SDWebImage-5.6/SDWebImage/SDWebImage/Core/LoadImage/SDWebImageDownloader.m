@@ -188,6 +188,7 @@ static void * SDWebImageDownloaderContext = &SDWebImageDownloaderContext;
     return [self downloadImageWithURL:url options:options context:nil progress:progressBlock completed:completedBlock];
 }
 
+// step6.2 下载图片的核心方法
 - (nullable SDWebImageDownloadToken *)downloadImageWithURL:(nullable NSURL *)url
                                                    options:(SDWebImageDownloaderOptions)options
                                                    context:(nullable SDWebImageContext *)context
@@ -202,6 +203,7 @@ static void * SDWebImageDownloaderContext = &SDWebImageDownloaderContext;
         return nil;
     }
     
+    // 注意这里加锁的操作，保证线程安全
     SD_LOCK(self.operationsLock);
     id downloadOperationCancelToken;
     NSOperation<SDWebImageDownloaderOperation> *operation = [self.URLOperations objectForKey:url];
@@ -569,6 +571,8 @@ didReceiveResponse:(NSURLResponse *)response
 
 /// step6: 如果在cache 中没有找到缓存图片，那么就在SDWebImageManger 中调用 requestImage(url,options,context,progress,completed) 来请求网络图片
 - (id<SDWebImageOperation>)requestImageWithURL:(NSURL *)url options:(SDWebImageOptions)options context:(SDWebImageContext *)context progress:(SDImageLoaderProgressBlock)progressBlock completed:(SDImageLoaderCompletedBlock)completedBlock {
+    
+    // 生成 optons
     UIImage *cachedImage = context[SDWebImageContextLoaderCachedImage];
     
     SDWebImageDownloaderOptions downloaderOptions = 0;

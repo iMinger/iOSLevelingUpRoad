@@ -13,6 +13,8 @@
 #import "UIImage+Metadata.h"
 #import "SDInternalMacros.h"
 
+// 二进制解码生成UIImage 对象
+
 UIImage * _Nullable SDImageCacheDecodeImageData(NSData * _Nonnull imageData, NSString * _Nonnull cacheKey, SDWebImageOptions options, SDWebImageContext * _Nullable context) {
     UIImage *image;
     BOOL decodeFirstFrame = SD_OPTIONS_CONTAINS(options, SDWebImageDecodeFirstFrameOnly);
