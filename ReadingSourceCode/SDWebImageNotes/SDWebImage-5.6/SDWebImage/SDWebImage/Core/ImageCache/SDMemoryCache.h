@@ -76,6 +76,11 @@
 
 @end
 
+
+/*
+ 2021.11.13 这里SDMemoryCache 是继承自系统的NSCache.YYCache 中的memoryCache是继承自原生的还是自己写的呢？
+ 在默认SDMemoryCache 对象中有一个 SDImageCacheConfig 缓存配置对象，里面有缓存策略以及缓存时间、大小等方面的设定值。
+ */
 /**
  A memory cache which auto purge the cache on memory warning and support weak cache.
  */

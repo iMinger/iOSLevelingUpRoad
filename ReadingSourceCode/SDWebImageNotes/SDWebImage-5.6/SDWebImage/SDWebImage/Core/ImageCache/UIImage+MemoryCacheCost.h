@@ -22,6 +22,10 @@
  @note Note that because of the limitations of category this property can get out of sync if you create another instance with CGImage or other methods.
  @note For custom animated class conforms to `SDAnimatedImage`, you can override this getter method in your subclass to return a more proper value instead, which representing the current frame's total bytes.
  */
+
+/*
+ 在分类中添加属性，需要手动实现set和get方法，并动态绑定
+ */
 @property (assign, nonatomic) NSUInteger sd_memoryCost;
 
 @end

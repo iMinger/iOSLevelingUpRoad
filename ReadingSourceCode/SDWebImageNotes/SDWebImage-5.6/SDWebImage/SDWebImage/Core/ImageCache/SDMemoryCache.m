@@ -17,6 +17,8 @@ static void * SDMemoryCacheContext = &SDMemoryCacheContext;
 
 @property (nonatomic, strong, nullable) SDImageCacheConfig *config;
 #if SD_UIKIT
+
+// NSMapTable 该数据结构中，对其value 是weak弱引用，不会造成引用计数器+1的问题，然后因为这里weakCache泛型，SDMemoryCache也设定了泛型。
 @property (nonatomic, strong, nonnull) NSMapTable<KeyType, ObjectType> *weakCache; // strong-weak cache
 @property (nonatomic, strong, nonnull) dispatch_semaphore_t weakCacheLock; // a lock to keep the access to `weakCache` thread-safe
 #endif
@@ -25,6 +27,7 @@ static void * SDMemoryCacheContext = &SDMemoryCacheContext;
 @implementation SDMemoryCache
 
 - (void)dealloc {
+    // KVO 在dealloc 的时候，要将观察者去掉，防止出现内存泄漏的问题
     [_config removeObserver:self forKeyPath:NSStringFromSelector(@selector(maxMemoryCost)) context:SDMemoryCacheContext];
     [_config removeObserver:self forKeyPath:NSStringFromSelector(@selector(maxMemoryCount)) context:SDMemoryCacheContext];
 #if SD_UIKIT
@@ -33,6 +36,7 @@ static void * SDMemoryCacheContext = &SDMemoryCacheContext;
     self.delegate = nil;
 }
 
+// 目前一个SDMemoryCache 有两种实例化方式：一种是使用默认SDImageCacheConfig，一种是外部传入SDImageCacheConfig
 - (instancetype)init {
     self = [super init];
     if (self) {
@@ -51,6 +55,7 @@ static void * SDMemoryCacheContext = &SDMemoryCacheContext;
     return self;
 }
 
+// 在这里设定一些公共初始化参数和KVO
 - (void)commonInit {
     SDImageCacheConfig *config = self.config;
     self.totalCostLimit = config.maxMemoryCost;
@@ -84,6 +89,7 @@ static void * SDMemoryCacheContext = &SDMemoryCacheContext;
         return;
     }
     if (key && obj) {
+        // 这里如果允许使用弱引用内存缓存，那么就需要将obj存到weakCache中
         // Store weak cache
         SD_LOCK(self.weakCacheLock);
         [self.weakCache setObject:obj forKey:key];
@@ -92,6 +98,7 @@ static void * SDMemoryCacheContext = &SDMemoryCacheContext;
 }
 
 - (id)objectForKey:(id)key {
+    // 因为SDMemoryCache是继承自NSCache的，所以可以通过父类中的objectForKey 取得对象。
     id obj = [super objectForKey:key];
     if (!self.config.shouldUseWeakMemoryCache) {
         return obj;
@@ -113,6 +120,7 @@ static void * SDMemoryCacheContext = &SDMemoryCacheContext;
     return obj;
 }
 
+// 从NSCache 中移除该key-value, 并尝试从weakCache 中移除
 - (void)removeObjectForKey:(id)key {
     [super removeObjectForKey:key];
     if (!self.config.shouldUseWeakMemoryCache) {

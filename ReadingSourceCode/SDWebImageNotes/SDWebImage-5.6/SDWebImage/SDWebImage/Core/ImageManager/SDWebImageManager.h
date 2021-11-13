@@ -15,6 +15,19 @@
 #import "SDWebImageCacheSerializer.h"
 #import "SDWebImageOptionsProcessor.h"
 
+/*
+ 2021.11.13: SDWebImageManager 是一个单例类，该类中包含以下几个对象属性：
+ imageCache:   用来处理缓存操作的对象，例如从cache 中读取缓存数据，将图片存入缓存中。
+ imageLoader:  用来处理请求网络图片资源对象，
+ transformer:  图片资源获取后，根据传入的参数对原始图片资源进行tranform的对象
+ cacheKeyFilter: 可用来自定义缓存key策略的对象
+ cacheSerializer: 缓存序列化对象
+ optionsProcessor: options 处理器对象
+ defaultImageCache:
+ defaultImageLoader:
+ */
+
+
 typedef void(^SDExternalCompletionBlock)(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL);
 
 typedef void(^SDInternalCompletionBlock)(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL);

@@ -14,6 +14,7 @@
 #import "SDMemoryCache.h"
 #import "SDDiskCache.h"
 
+/// 定义cache选项
 /// Image Cache Options
 typedef NS_OPTIONS(NSUInteger, SDImageCacheOptions) {
     /**
@@ -54,6 +55,11 @@ typedef NS_OPTIONS(NSUInteger, SDImageCacheOptions) {
      */
     SDImageCacheMatchAnimatedImageClass = 1 << 7,
 };
+
+
+/*
+ SDImageCache 是一个单例类，内部持有两个对象： memoryCache 和 diskCache
+ */
 
 /**
  * SDImageCache maintains a memory cache and a disk cache. Disk cache write operations are performed
