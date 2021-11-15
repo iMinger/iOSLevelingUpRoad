@@ -59,10 +59,15 @@ const int64_t SDWebImageProgressUnitCountUnknown = 1LL;
     
     // 下面这三四行代码是确定本次请求加载图片操作的 key, 这个key很重要，用于标记本次operation操作，放入 SDOperationsDictionary 弱引用字典中(NSMapTable,该数据结构类型对其中的每一个value都是weak引用，不会引用计数+1)，当下次同样一个UIImageView 进行网络请求的时候，可以先将上次的请求cancel 掉，重新开始新的operation 操作。
     NSString *validOperationKey = context[SDWebImageContextSetImageOperationKey];
+    NSLog(@"context[SDWebImageContextSetImageOperationKey] = %@",context[SDWebImageContextSetImageOperationKey]);
+    // 一般来说，如果我们没有设置context,那么默认的validOperationKey 都是当前对象的类名。
+    // 每一个对象都包含一个字典，
     if (!validOperationKey) {
         validOperationKey = NSStringFromClass([self class]);
+        NSLog(@"NSLog = NSStringFromClass([self class] : %@",NSStringFromClass([self class]));
     }
     self.sd_latestOperationKey = validOperationKey;
+    
     
     // 这里先cancel 掉之前的还没进行完的 validOperationKey的 operation 线程。方便下面开启新的请求线程。
     [self sd_cancelImageLoadOperationWithKey:validOperationKey];

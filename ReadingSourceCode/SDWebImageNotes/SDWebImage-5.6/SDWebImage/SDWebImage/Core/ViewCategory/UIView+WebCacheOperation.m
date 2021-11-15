@@ -17,6 +17,7 @@ typedef NSMapTable<NSString *, id<SDWebImageOperation>> SDOperationsDictionary;
 
 @implementation UIView (WebCacheOperation)
 
+// 给UIView 对象都添加一个 operationDictionary 字典，用来保存加载图片资源的operation操作对象。
 - (SDOperationsDictionary *)sd_operationDictionary {
     @synchronized(self) {
         SDOperationsDictionary *operations = objc_getAssociatedObject(self, &loadOperationKey);
@@ -52,6 +53,7 @@ typedef NSMapTable<NSString *, id<SDWebImageOperation>> SDOperationsDictionary;
     }
 }
 
+// 取消key所对应的图片加载的 operation 对象，为后来 新的operation 保存做准备
 - (void)sd_cancelImageLoadOperationWithKey:(nullable NSString *)key {
     if (key) {
         // Cancel in progress downloader from queue

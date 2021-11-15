@@ -70,6 +70,7 @@ static id<SDImageLoader> _defaultImageLoader;
     return instance;
 }
 
+// 默认构造方法，cache 使用的是默认的 defaultImageCache，loader 使用的是默认的 defaultImageLoader， 里面都有各自默认的一些参数实现
 - (nonnull instancetype)init {
     id<SDImageCache> cache = [[self class] defaultImageCache];
     if (!cache) {
